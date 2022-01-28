@@ -1,5 +1,6 @@
 import chess
-import random 
+import random
+import search
 
 def main():
 
@@ -9,7 +10,7 @@ def main():
         print(line)
 
     def selectmove():
-        return random.choice(list(board.legal_moves))
+        return random.choice(list(board.legal_moves)) 
 
     stack = []
     while True:
@@ -61,8 +62,9 @@ def main():
                 board.push(chess.Move.from_uci(move))
 
         elif smove.startswith('go'):
-            output('bestmove ' + selectmove().uci())
-            board.push(selectmove())
+            ourmove = search.minimax(board, 3, board.turn)[1]
+            output('bestmove ' + ourmove.uci())
+            board.push(ourmove)
 
         else:
             pass

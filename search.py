@@ -1,12 +1,6 @@
 import evaluate
 import random
 
-"""def moveOrder(moves, moveScoreList):
-    movesWithScores = []
-    sortedMoves = []
-    for i in range(len(moves)):
-        movesWithScores.append([moveScoreList[i], moves[i]])"""
-
 MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim None, attacker None, P, N, B, R, Q, K
     [0, 15, 14, 13, 12, 11, 10], # victim P, attacker None, P, N, B, R, Q, K
@@ -17,6 +11,24 @@ MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim K, attacker None, P, N, B, R, Q, K
 ]
 
+def swap(l, a, b):
+    l[a], l[b] = l[b], l[a]
+
+def scoreMoves(moves, board):
+    move_scores = {}
+    for move in moves:
+        if (board.is_capture(move)):
+            capturing_piece = board.piece_at(move.from_square).piece_type
+            captured_piece = board.piece_at(move.to_square).piece_type
+            move_scores[move] = MVV_LVA[captured_piece][capturing_piece]
+        else:
+            move_scores[move] = 0
+    return move_scores
+
+def pickMove(moves, move_scores, start_index):
+    for i in range(start_index+1, len(moves)):
+        if (move_scores[moves[i]] > move_scores[moves[start_index]]):
+            swap(moves, start_index, i)
 
 # returns evaluation
 def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
@@ -33,8 +45,15 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
     else:
         nextPlayer = True
 
-    for move in board.legal_moves:
-        board.push(move)
+    # move ordering stuff goes here
+    moves = list(board.legal_moves)
+    move_scores = scoreMoves(moves, board)
+
+    for i in range(len(moves)):
+        #pickMove
+        pickMove(moves, move_scores, i)
+        current_move = moves[i]
+        board.push(current_move)
         alphabetaminimaxresult = alphabetaminimax(board, depth-1, alpha, beta, nextPlayer)
         eval = alphabetaminimaxresult[0]
         nodes += alphabetaminimaxresult[2]
@@ -43,11 +62,11 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
         minEval = min(minEval, eval)
         if (maximizingPlayer):
             if (eval == maxEval):
-                bestmove = move   
+                bestmove = current_move   
             alpha = max(alpha, eval)
         else:
             if (eval == minEval):
-                bestmove = move   
+                bestmove = current_move   
             beta = min(beta, eval)
         if (beta < alpha):
             #print('player at cuttoff: white') if maximizingPlayer else print('player at cuttoff: black')
@@ -64,108 +83,4 @@ def searcher(board, depth):
             #or if move time is up
             return result
 
-
-
-    """if (maximizingPlayer):
-        maxEval = -9999
-        nodes = 0
-        #bestmove = random.choice(list(board.legal_moves))
-        for move in board.legal_moves:
-            board.push(move)
-            alphabetaminimaxresult = alphabetaminimax(board, depth-1, alpha, beta, False)
-            eval = alphabetaminimaxresult[0]
-            nodes += alphabetaminimaxresult[2]
-            board.pop()
-            maxEval = max(maxEval, eval)
-            if (eval == maxEval):
-                bestmove = move   
-            alpha = max(alpha, eval)
-            if (beta <= alpha):
-                break
-             
-        return([maxEval, bestmove, nodes+1])
-    
-    else:
-        minEval = 9999
-        nodes = 0
-        #bestmove = random.choice(list(board.legal_moves))
-        for move in board.legal_moves:
-            board.push(move)
-            alphabetaminimaxresult = alphabetaminimax(board, depth-1, alpha, beta, True)
-            eval = alphabetaminimaxresult[0]
-            nodes += alphabetaminimaxresult[2]
-            board.pop()
-            minEval = min(minEval, eval)
-            if (eval == minEval):
-                bestmove = move
-            beta = min(beta, eval)
-            if (beta <= alpha):
-                break
-            
-        return([minEval, bestmove, nodes+1])"""
-
-# returns best move
-"""def searcher(board, depth):
-    # progressive deepening
-
-
-    for i in range(depth):
-        if (board.turn):
-            maxEval = -9999
-            for move in board.legal_moves:
-                board.push(move)
-                eval = alphabetaminimax(board, i, -9999, 9999, False)
-                board.pop()
-                maxEval = max(maxEval, eval)
-                if (eval == maxEval):
-                    bestmove = move
-        else:
-            minEval = 9999
-            for move in board.legal_moves:
-                board.push(move)
-                eval = alphabetaminimax(board, i, -9999, 9999, True)
-                board.pop()
-                minEval = min(minEval, eval)
-                if (eval == minEval):
-                    bestmove = move
-        if (i == depth - 1):
-            # or if time for move is up (to be added later)
-            return bestmove
-        else:
-            pass
- """           
-
-
-
-def minimax(board, depth, maximizingPlayer):
-    if (depth == 0 or board.is_game_over()):
-        return([evaluate.evaluate_board(board), None, 1])
-
-    if (maximizingPlayer):
-        maxEval = -9999
-        nodes = 0
-        for move in board.legal_moves:
-            board.push(move)
-            minimaxresult = minimax(board, depth-1, False)
-            eval = minimaxresult[0]
-            nodes += minimaxresult[2]
-            maxEval = max(maxEval, eval)
-            if (eval == maxEval):
-                bestmove = move
-            board.pop()
-        return([maxEval, bestmove, nodes+1])
-    
-    else:
-        minEval = 9999
-        nodes = 0
-        for move in board.legal_moves:
-            board.push(move)
-            minimaxresult = minimax(board, depth-1, True)
-            eval = minimaxresult[0]
-            nodes += minimaxresult[2]
-            minEval = min(minEval, eval)
-            if (eval == minEval):
-                bestmove = move
-            board.pop()
-        return([minEval, bestmove, nodes+1])
 

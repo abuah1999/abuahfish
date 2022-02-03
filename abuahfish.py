@@ -10,9 +10,6 @@ def main():
     def output(line):
         print(line)
 
-    def selectmove():
-        return random.choice(list(board.legal_moves)) 
-
     stack = []
     while True:
         if stack:

@@ -1,5 +1,6 @@
 import evaluate
 import random
+import time
 
 MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim None, attacker None, P, N, B, R, Q, K
@@ -17,10 +18,10 @@ def swap(l, a, b):
 def scoreMoves(moves, board):
     move_scores = {}
     for move in moves:
-        if (board.is_capture(move)):
-            capturing_piece = board.piece_at(move.from_square).piece_type
-            captured_piece = board.piece_at(move.to_square).piece_type
-            move_scores[move] = MVV_LVA[captured_piece][capturing_piece]
+        capturing_piece = board.piece_at(move.from_square)
+        captured_piece = board.piece_at(move.to_square)
+        if (capturing_piece and captured_piece):   
+            move_scores[move] = MVV_LVA[captured_piece.piece_type][capturing_piece.piece_type]
         else:
             move_scores[move] = 0
     return move_scores
@@ -76,11 +77,15 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
     else:
         return([minEval, bestmove, nodes+1])
 
-def searcher(board, depth):
+def searcher(board, depth, our_time, movetime):
+    moves_remain = 40
+    start_time = time.time()
     for i in range(1, depth+1):
         result = alphabetaminimax(board, i, -9999, 9999, board.turn)
-        if (i == depth):
+        if (i == depth or
             #or if move time is up
+            (movetime > 0 and (time.time() - start_time) * 1000 > movetime) or
+            ((time.time() - start_time) * 1000 > our_time/moves_remain)):
             return result
 
 

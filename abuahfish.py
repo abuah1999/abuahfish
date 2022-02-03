@@ -60,14 +60,23 @@ def main():
                 board.push(chess.Move.from_uci(move))
 
         elif smove.startswith('go'):
+            # deafault options
+
+            depth = 1000
+            movetime = -1
+            our_time = 10000
+
+            _, *params = smove.split(' ')
+            for param, val in zip(*2*(iter(params),)):
+                if param == 'depth':
+                    depth = int(val)
+                if param == 'movetime':
+                    movetime = int(val)
+                if param == 'wtime':
+                    our_time = int(val)
+
             start_time = time.time()
-            #minimaxresult = search.minimax(board, 3, board.turn)
-            #ourmove = minimaxresult[1]
-            #nodes = minimaxresult[2]
-            #alphabetaminimaxresult = search.alphabetaminimax(board, 3, -9999, 9999, board.turn)
-            #ourmove = alphabetaminimaxresult[1]
-            #nodes = alphabetaminimaxresult[2]
-            result = search.searcher(board, 3)
+            result = search.searcher(board, depth, our_time, movetime)
             ourmove = result[1]
             nodes = result[2]
             end_time = time.time()
@@ -76,6 +85,7 @@ def main():
             output('time taken: ' + str(time_taken))
             output('nodes: ' + str(nodes))
             board.push(ourmove)
+
 
         else:
             pass

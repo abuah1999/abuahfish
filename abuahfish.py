@@ -1,6 +1,7 @@
 import chess
 import random
 import search
+import time
 
 def main():
 
@@ -62,8 +63,21 @@ def main():
                 board.push(chess.Move.from_uci(move))
 
         elif smove.startswith('go'):
-            ourmove = search.minimax(board, 3, board.turn)[1]
+            start_time = time.time()
+            #minimaxresult = search.minimax(board, 3, board.turn)
+            #ourmove = minimaxresult[1]
+            #nodes = minimaxresult[2]
+            #alphabetaminimaxresult = search.alphabetaminimax(board, 3, -9999, 9999, board.turn)
+            #ourmove = alphabetaminimaxresult[1]
+            #nodes = alphabetaminimaxresult[2]
+            result = search.searcher(board, 3)
+            ourmove = result[1]
+            nodes = result[2]
+            end_time = time.time()
+            time_taken = end_time - start_time
             output('bestmove ' + ourmove.uci())
+            output('time taken: ' + str(time_taken))
+            output('nodes: ' + str(nodes))
             board.push(ourmove)
 
         else:

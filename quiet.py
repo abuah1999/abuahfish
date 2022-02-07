@@ -1,7 +1,5 @@
 import evaluate
-#import random
-from time import time
-import quiet
+
 
 MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim None, attacker None, P, N, B, R, Q, K
@@ -17,6 +15,19 @@ def swap(l, a, b):
     l[a], l[b] = l[b], l[a]
 
 def scoreMoves(moves, board):
+    capture_moves = []
+    move_scores = {}
+    for move in moves:
+        capturing_piece = board.piece_at(move.from_square)
+        captured_piece = board.piece_at(move.to_square)  
+        if (capturing_piece and captured_piece):   
+            capture_moves.append(move)
+            move_scores[move] = MVV_LVA[captured_piece.piece_type][capturing_piece.piece_type]
+        else:
+            pass
+    return [capture_moves, move_scores]
+
+"""def scoreMoves(moves, board):
     move_scores = {}
     for move in moves:
         capturing_piece = board.piece_at(move.from_square)
@@ -25,7 +36,7 @@ def scoreMoves(moves, board):
             move_scores[move] = MVV_LVA[captured_piece.piece_type][capturing_piece.piece_type]
         else:
             move_scores[move] = 0
-    return move_scores
+    return move_scores"""
 
 def pickMove(moves, move_scores, start_index):
     for i in range(start_index+1, len(moves)):
@@ -33,63 +44,46 @@ def pickMove(moves, move_scores, start_index):
             swap(moves, start_index, i)
 
 # returns evaluation
-def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
+def search(board, depth, alpha, beta, maximizingPlayer):
+    #if (depth == 0 or board.is_game_over()):
+    #    return([evaluate.evaluate_board(board), None, 1])
+    
+    maxEval = -9999
+    minEval = 9999
+    #bestmove = random.choice(list(board.legal_moves))
 
     if (maximizingPlayer):
         nextPlayer = False
     else:
         nextPlayer = True
 
-    if (board.is_game_over()):
-        return([evaluate.evaluate_board(board), None, 1])
-
-    if (depth == 0):
-        return([quiet.search(board, 1, -9999, 9999, nextPlayer), None, 1])
-    
-    maxEval = -9999
-    minEval = 9999
-    nodes = 0
-    #bestmove = random.choice(list(board.legal_moves))
-
     # move ordering stuff goes here
     moves = list(board.legal_moves)
-    move_scores = scoreMoves(moves, board)
+    capture_moves_with_scores = scoreMoves(moves, board)
+    capture_moves = capture_moves_with_scores[0]
+    move_scores = capture_moves_with_scores[1]
 
-    for i in range(len(moves)):
+    if(depth == 0 or len(capture_moves) == 0 or board.is_game_over()):
+        return evaluate.evaluate_board(board)
+
+    for i in range(len(capture_moves)):
         #pickMove
-        pickMove(moves, move_scores, i)
-        current_move = moves[i]
+        pickMove(capture_moves, move_scores, i)
+        current_move = capture_moves[i]
         board.push(current_move)
-        alphabetaminimaxresult = alphabetaminimax(board, depth-1, alpha, beta, nextPlayer)
-        eval = alphabetaminimaxresult[0]
-        nodes += alphabetaminimaxresult[2]
+        eval = search(board, depth-1, alpha, beta, nextPlayer)
         board.pop()
         maxEval = max(maxEval, eval)
         minEval = min(minEval, eval)
-        if (maximizingPlayer):
-            if (eval == maxEval):
-                bestmove = current_move   
+        if (maximizingPlayer):   
             alpha = max(alpha, eval)
-        else:
-            if (eval == minEval):
-                bestmove = current_move   
+        else:   
             beta = min(beta, eval)
         if (beta < alpha):
             break
     if (maximizingPlayer):
-        return([maxEval, bestmove, nodes+1])
+        return(maxEval)
     else:
-        return([minEval, bestmove, nodes+1])
-
-def searcher(board, depth, our_time, movetime):
-    moves_remain = 40
-    start_time = time()
-    for i in range(1, depth+1):
-        result = alphabetaminimax(board, i, -9999, 9999, board.turn)
-        if (i == depth or
-            #or if move time is up
-            (movetime > 0 and (time() - start_time) * 1000 > movetime) or
-            ((time() - start_time) * 1000 > our_time/moves_remain)):
-            return result
+        return(minEval)
 
 

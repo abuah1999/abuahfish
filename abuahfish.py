@@ -1,11 +1,11 @@
-import chess
-import random
+from chess import Board, Move
+#import random
 import search
-import time
+#import time
 
 def main():
 
-    board = chess.Board()
+    board = Board()
 
     def output(line):
         print(line)
@@ -54,18 +54,18 @@ def main():
             else:
                 pass
 
-            board = chess.Board(fen)
+            board = Board(fen)
 
             for move in moveslist:
-                board.push(chess.Move.from_uci(move))
+                board.push(Move.from_uci(move))
 
         elif smove.startswith('go'):
             # deafault options
 
-            depth = 1000
+            depth = 3
+            our_time = 40000000
             movetime = -1
-            our_time = 10000
-
+            
             _, *params = smove.split(' ')
             for param, val in zip(*2*(iter(params),)):
                 if param == 'depth':
@@ -75,15 +75,15 @@ def main():
                 if param == 'wtime':
                     our_time = int(val)
 
-            start_time = time.time()
+            #start_time = time.time()
             result = search.searcher(board, depth, our_time, movetime)
             ourmove = result[1]
-            nodes = result[2]
-            end_time = time.time()
-            time_taken = end_time - start_time
+            #nodes = result[2]
+            #end_time = time.time()
+            #time_taken = end_time - start_time
             output('bestmove ' + ourmove.uci())
-            output('time taken: ' + str(time_taken))
-            output('nodes: ' + str(nodes))
+            #output('time taken: ' + str(time_taken))
+            #output('nodes: ' + str(nodes))
             board.push(ourmove)
 
 

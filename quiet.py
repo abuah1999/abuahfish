@@ -14,7 +14,7 @@ MVV_LVA = [
 def swap(l, a, b):
     l[a], l[b] = l[b], l[a]
 
-def scoreMoves(moves, board):
+def scoreCaptureMoves(moves, board):
     capture_moves = []
     move_scores = {}
     for move in moves:
@@ -44,7 +44,7 @@ def pickMove(moves, move_scores, start_index):
             swap(moves, start_index, i)
 
 # returns evaluation
-def search(board, depth, alpha, beta, maximizingPlayer):
+def quietsearch(board, depth, alpha, beta, maximizingPlayer):
     #if (depth == 0 or board.is_game_over()):
     #    return([evaluate.evaluate_board(board), None, 1])
     
@@ -59,7 +59,7 @@ def search(board, depth, alpha, beta, maximizingPlayer):
 
     # move ordering stuff goes here
     moves = list(board.legal_moves)
-    capture_moves_with_scores = scoreMoves(moves, board)
+    capture_moves_with_scores = scoreCaptureMoves(moves, board)
     capture_moves = capture_moves_with_scores[0]
     move_scores = capture_moves_with_scores[1]
 
@@ -71,7 +71,7 @@ def search(board, depth, alpha, beta, maximizingPlayer):
         pickMove(capture_moves, move_scores, i)
         current_move = capture_moves[i]
         board.push(current_move)
-        eval = search(board, depth-1, alpha, beta, nextPlayer)
+        eval = quietsearch(board, depth-1, alpha, beta, nextPlayer)
         board.pop()
         maxEval = max(maxEval, eval)
         minEval = min(minEval, eval)

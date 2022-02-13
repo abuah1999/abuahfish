@@ -62,7 +62,7 @@ def main():
         elif smove.startswith('go'):
             # deafault options
 
-            depth = 3
+            depth = 1000
             our_time = 40000000
             movetime = -1
             
@@ -76,6 +76,7 @@ def main():
                     our_time = int(val)
 
             #start_time = time.time()
+            
             result = search.searcher(board, depth, our_time, movetime)
             ourmove = result[1]
             #nodes = result[2]

@@ -40,11 +40,11 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
     else:
         nextPlayer = True
 
-    if (board.is_game_over()):
+    if (board.is_game_over() or depth == 0):
         return([evaluate.evaluate_board(board), None, 1])
 
-    if (depth == 0):
-        return([quiet.search(board, 1, -9999, 9999, nextPlayer), None, 1])
+    #if (depth == 0):
+    #    return([quiet.quietsearch(board, 1, -9999, 9999, nextPlayer), None, 1])
     
     maxEval = -9999
     minEval = 9999

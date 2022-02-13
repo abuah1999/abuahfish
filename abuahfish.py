@@ -62,7 +62,7 @@ def main():
         elif smove.startswith('go'):
             # deafault options
 
-            depth = 3
+            depth = 100
             our_time = 40000000
             movetime = -1
             

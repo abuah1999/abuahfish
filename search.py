@@ -13,6 +13,9 @@ MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim K, attacker None, P, N, B, R, Q, K
 ]
 
+MOVES_REMAIN = 40
+
+
 def swap(l, a, b):
     l[a], l[b] = l[b], l[a]
 
@@ -33,7 +36,14 @@ def pickMove(moves, move_scores, start_index):
             swap(moves, start_index, i)
 
 # returns evaluation
-def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
+def alphabetaminimax(board, start_depth, depth, alpha, beta, maximizingPlayer, st, ot, mt):
+
+    if ((mt > 0 and (time() - st) * 1000 > mt) or
+            ((time() - st) * 1000 > ot/MOVES_REMAIN)):
+        while(start_depth > depth):
+            board.pop()
+            depth += 1   
+        raise Exception("time up")
 
     if (maximizingPlayer):
         nextPlayer = False
@@ -60,7 +70,7 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
         pickMove(moves, move_scores, i)
         current_move = moves[i]
         board.push(current_move)
-        alphabetaminimaxresult = alphabetaminimax(board, depth-1, alpha, beta, nextPlayer)
+        alphabetaminimaxresult = alphabetaminimax(board, start_depth, depth-1, alpha, beta, nextPlayer, st, ot, mt)
         eval = alphabetaminimaxresult[0]
         nodes += alphabetaminimaxresult[2]
         board.pop()
@@ -82,14 +92,17 @@ def alphabetaminimax(board, depth, alpha, beta, maximizingPlayer):
         return([minEval, bestmove, nodes+1])
 
 def searcher(board, depth, our_time, movetime):
-    moves_remain = 40
     start_time = time()
+    result = alphabetaminimax(board, 0, 0, -9999, 9999, board.turn, start_time, our_time, movetime)
     for i in range(1, depth+1):
-        result = alphabetaminimax(board, i, -9999, 9999, board.turn)
+        try:
+            result = alphabetaminimax(board, i, i, -9999, 9999, board.turn, start_time, our_time, movetime)
+        except:
+            return result
         if (i == depth or
             #or if move time is up
             (movetime > 0 and (time() - start_time) * 1000 > movetime) or
-            ((time() - start_time) * 1000 > our_time/moves_remain)):
+            ((time() - start_time) * 1000 > our_time/MOVES_REMAIN)):
             return result
 
 

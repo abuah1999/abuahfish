@@ -72,7 +72,9 @@ def main():
                     depth = int(val)
                 if param == 'movetime':
                     movetime = int(val)
-                if param == 'wtime':
+                if param == 'wtime' and board.turn:
+                    our_time = int(val)
+                if param == 'btime' and not board.turn:
                     our_time = int(val)
 
             #start_time = time.time()

@@ -1,9 +1,8 @@
-import evaluate
-#import random
-from time import time
-import quiet
 
-MVV_LVA = [
+import evaluate
+from time import time
+
+cdef list MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim None, attacker None, P, N, B, R, Q, K
     [0, 15, 14, 13, 12, 11, 10], # victim P, attacker None, P, N, B, R, Q, K
     [0, 25, 24, 23, 22, 21, 20], # victim N, attacker None, P, N, B, R, Q, K
@@ -13,13 +12,13 @@ MVV_LVA = [
     [0, 0, 0, 0, 0, 0, 0],       # victim K, attacker None, P, N, B, R, Q, K
 ]
 
-MOVES_REMAIN = 40
+cdef int MOVES_REMAIN = 40
 
 
-def swap(l, a, b):
+cdef void swap(list l, int a, int b):
     l[a], l[b] = l[b], l[a]
 
-def scoreMoves(moves, board):
+cdef dict scoreMoves(list moves, board):
     move_scores = {}
     for move in moves:
         capturing_piece = board.piece_at(move.from_square)
@@ -30,13 +29,15 @@ def scoreMoves(moves, board):
             move_scores[move] = 0
     return move_scores
 
-def pickMove(moves, move_scores, start_index):
+cdef void pickMove(list moves, dict move_scores, int start_index):
     for i in range(start_index+1, len(moves)):
         if (move_scores[moves[i]] > move_scores[moves[start_index]]):
             swap(moves, start_index, i)
 
+
+
 # returns evaluation
-def alphabetaminimax(board, start_depth, depth, alpha, beta, maximizingPlayer, st, ot, mt):
+cdef list alphabetaminimax(board, int start_depth, int depth, int alpha, int beta, bint maximizingPlayer, long int st, long int ot, long int mt):
 
     if ((mt > 0 and (time() - st) * 1000 > mt) or
             ((time() - st) * 1000 > ot/MOVES_REMAIN)):
@@ -56,34 +57,36 @@ def alphabetaminimax(board, start_depth, depth, alpha, beta, maximizingPlayer, s
     #if (depth == 0):
     #    return([quiet.quietsearch(board, 1, -9999, 9999, nextPlayer), None, 1])
     
-    maxEval = -9999
-    minEval = 9999
-    nodes = 0
+    cdef int maxEval = -9999
+    cdef int minEval = 9999
+    cdef int nodes = 0
+    cdef list alphabetaminimaxresult
+    cdef int evalu, i
     #bestmove = random.choice(list(board.legal_moves))
 
     # move ordering stuff goes here
-    moves = list(board.legal_moves)
-    move_scores = scoreMoves(moves, board)
-
+    cdef list moves = list(board.legal_moves)
+    cdef dict move_scores = scoreMoves(moves, board)
+    
     for i in range(len(moves)):
         #pickMove
         pickMove(moves, move_scores, i)
         current_move = moves[i]
         board.push(current_move)
         alphabetaminimaxresult = alphabetaminimax(board, start_depth, depth-1, alpha, beta, nextPlayer, st, ot, mt)
-        eval = alphabetaminimaxresult[0]
+        evalu = alphabetaminimaxresult[0]
         nodes += alphabetaminimaxresult[2]
         board.pop()
-        maxEval = max(maxEval, eval)
-        minEval = min(minEval, eval)
+        maxEval = max(maxEval, evalu)
+        minEval = min(minEval, evalu)
         if (maximizingPlayer):
-            if (eval == maxEval):
+            if (evalu == maxEval):
                 bestmove = current_move   
-            alpha = max(alpha, eval)
+            alpha = max(alpha, evalu)
         else:
-            if (eval == minEval):
+            if (evalu == minEval):
                 bestmove = current_move   
-            beta = min(beta, eval)
+            beta = min(beta, evalu)
         if (beta < alpha):
             break
     if (maximizingPlayer):
@@ -91,9 +94,10 @@ def alphabetaminimax(board, start_depth, depth, alpha, beta, maximizingPlayer, s
     else:
         return([minEval, bestmove, nodes+1])
 
-def searcher(board, depth, our_time, movetime):
-    start_time = time()
-    result = alphabetaminimax(board, 0, 0, -9999, 9999, board.turn, start_time, our_time, movetime)
+cpdef list searcher(board, int depth, long int our_time, long int movetime):
+    cdef long int start_time = time()
+    cdef list result = alphabetaminimax(board, 0, 0, -9999, 9999, board.turn, start_time, our_time, movetime)
+    cdef int i
     for i in range(1, depth+1):
         try:
             result = alphabetaminimax(board, i, i, -9999, 9999, board.turn, start_time, our_time, movetime)

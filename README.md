@@ -19,7 +19,13 @@ cd abuahfish
 git clone <url>
 ```
 
-2. Use ```pyinstaller``` to generate the executable
+2. Install Cython and use this command to generate the c object files
+
+```
+python setup.py build_ext --inplace
+```
+
+3. Use ```pyinstaller``` to generate the executable
 
 ```
 pyinstaller -F abuahfish.py 
@@ -30,7 +36,7 @@ pyinstaller -F abuahfish.py
 pip install pyinstaller
 ```
 
-3. Load the executable file into a chess GUI (e.g ArenaGUI, SCID vs PC) and have fun!
+4. Load the executable file into a chess GUI (e.g ArenaGUI, SCID vs PC) and have fun!
 
 #### the name
 

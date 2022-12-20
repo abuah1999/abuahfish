@@ -1,11 +1,9 @@
 # abuahfish
 
-> 'Sblood, you starveling, you elf-skin, you dried neat's tongue, you bull's pizzle, you stock-fish!  
->    **_1 Henry IV (2.4.227-9)_**
+> 'Sblood, you starveling, you elf-skin, you dried neat's tongue, you bull's pizzle, you stock-fish!\
+> _**1 Henry IV (2.4.227-9)**_
 
-Abuahfish is a simple chess engine written in Python and using the python-chess library for move generation and validation. 
-It is UCI-compatible and so can work on most standard chess GUIs. It also makes use of the cython language extension for speed as well
-as various search-tree pruning methods. 
+abuahfish is a simple chess engine written in Python and using the python-chess library for move generation and validation. It is UCI-compatible and so can work on most standard chess GUIs. It also makes use of the cython language extension for speed as well as various search-tree pruning methods.
 
 Play the latest version here: [https://lichess.org/@/abuah2022](https://lichess.org/@/abuah2022)
 
@@ -19,13 +17,13 @@ cd abuahfish
 git clone <url>
 ```
 
-2. Install Cython and use this command to generate the c object files
+1. Install Cython and use this command to generate the c object files
 
 ```
 python setup.py build_ext --inplace
 ```
 
-3. Use ```pyinstaller``` to generate the executable
+1. Use `pyinstaller` to generate the executable
 
 ```
 pyinstaller -F abuahfish.py 
@@ -36,9 +34,8 @@ pyinstaller -F abuahfish.py
 pip install pyinstaller
 ```
 
-4. Load the executable file into a chess GUI (e.g ArenaGUI, SCID vs PC) and have fun!
+1. Load the executable file into a chess GUI (e.g ArenaGUI, SCID vs PC) and have fun!
 
 #### the name
 
-"Abuahfish" is derived from the name of the most powerful open-source chess engine: Stockfish. One day AF will be strong enough to challenge the 
-original fish, but it still has a long way to go...
+"Abuahfish" is derived from the name of the most powerful open-source chess engine: Stockfish. One day AF will be strong enough to challenge the original fish, but it still has a long way to go...
